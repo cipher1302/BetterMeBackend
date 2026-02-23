@@ -5,6 +5,7 @@ import cors from 'cors';
 import orderRoutes from './routes/orderRoutes.js'
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundRouteHandler } from './middlewares/notFoundRouteHandler.js';
+import { Order } from './db/models/OrderModel.js';
 
 const app = express();
 
@@ -24,7 +25,7 @@ async function startServer(req, res) {
 
 // Routes
 
-app.use("api/orders", orderRoutes)
+app.use("/api/orders", orderRoutes)
 
 // Middleware handlers
 app.use(errorHandler);
@@ -33,3 +34,5 @@ app.use(notFoundRouteHandler);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+startServer();
