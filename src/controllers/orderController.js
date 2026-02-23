@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
-import { getAllOrdersService,createOrderService } from "../services/orderService.js"
+import { getAllOrdersService,createOrderService, importOrdersService } from "../services/orderService.js"
 
 export const showAllOrders = asyncHandler(async (req,res)=>{
     const orders = await getAllOrdersService()
@@ -16,4 +16,14 @@ export const createOrder = asyncHandler(async (req,res)=>{
         message:"Order created successfully",
         data:newOrder,
     })
+})
+
+export const importOrders = asyncHandler(async (req,res)=>{
+    const csvData = req.csvData
+    if (!csvData || csvData.length === 0) {
+      return res.status(400).json({ message: 'CSV empty or not loaded' });
+    }
+    await importOrdersService(csvData)
+
+    return res.json({ message: 'CSV imported successfully' });
 })

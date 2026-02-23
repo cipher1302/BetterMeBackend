@@ -38,3 +38,52 @@ export const createOrderService = async (payload) => {
   const newOrder = await Order.create(orderPayload);
   return newOrder;
 };
+export const importOrdersService = async (orders) => {
+  const processed = orders
+    .map((order, i) => {
+      const lat = parseFloat(order.latitude);
+      const lng = parseFloat(order.longitude);
+      const sub = parseFloat(order.subtotal);
+
+      if (isNaN(lat) || isNaN(lng) || isNaN(sub)) {
+        console.warn(`Order #${i} has invalid number(s), skipping`);
+        return null;
+      }
+
+      const countyName = getCounty(lat, lng);
+      if (!countyName) {
+        console.warn(`Order #${i} could not determine county`);
+        return null;
+      }
+
+      const taxData = calculateTax(sub, countyName);
+      if (!taxData) {
+        console.warn(`Order #${i} tax calculation failed`);
+        return null;
+      }
+
+
+      return {
+        ...order,
+        latitude: lat,
+        longitude: lng,
+        subtotal: sub,
+        county_name: countyName,
+        composite_tax_rate: taxData.composite_tax_rate,
+        tax_amount: taxData.tax_amount,
+        total_amount: taxData.total_amount,
+        state_rate: taxData.breakdown.state_rate,
+        county_rate: taxData.breakdown.county_rate,
+        city_rate: taxData.breakdown.city_rate,
+        special_rates: taxData.breakdown.special_rate,
+        tax_breakdown: taxData.breakdown,
+      };
+    })
+    .filter(Boolean);
+
+  const processedWithoutId = processed.map(({ id, ...rest }) => rest);
+  return await Order.bulkCreate(processedWithoutId, {
+    validate: true,
+    returning: true,
+  });
+};

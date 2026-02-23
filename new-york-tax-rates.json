@@ -48,6 +48,7 @@
   "Schoharie County":   { "state_rate": 0.04, "county_rate": 0.04, "city_rate": 0.0, "special_rate": 0.0 },
   "Schuyler County":    { "state_rate": 0.04, "county_rate": 0.04, "city_rate": 0.0, "special_rate": 0.0 },
   "Seneca County":      { "state_rate": 0.04, "county_rate": 0.04, "city_rate": 0.0, "special_rate": 0.0 },
+  "St. Lawrence County": { "state_rate": 0.04, "county_rate": 0.04, "city_rate": 0.0, "special_rate": 0.0 },
   "Steuben County":     { "state_rate": 0.04, "county_rate": 0.04, "city_rate": 0.0, "special_rate": 0.0 },
   "Suffolk County":     { "state_rate": 0.04, "county_rate": 0.04625, "city_rate": 0.0, "special_rate": 0.00375 },
   "Sullivan County":    { "state_rate": 0.04, "county_rate": 0.04125, "city_rate": 0.0, "special_rate": 0.0 },
