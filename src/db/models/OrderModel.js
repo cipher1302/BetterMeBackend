@@ -30,7 +30,9 @@ export const Order = sequelize.define("Order", {
 
   timestamp: {
     type: DataTypes.DATE,
-    allowNull: false
+    allowNull: false,
+    readOnly: true,
+    defaultValue: DataTypes.NOW,
   }
 
 }, {
