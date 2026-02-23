@@ -1,4 +1,3 @@
-import { log } from 'node:console';
 import fs from 'node:fs';
 
 const taxRates = JSON.parse(

@@ -12,7 +12,7 @@ export const Order = sequelize.define(
       type: DataTypes.DECIMAL(9, 6),
       allowNull: false,
       validate: {
-        min: 40.0,
+        min: 40.4,
         max: 45.1,
       },
     },

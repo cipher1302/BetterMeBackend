@@ -16,7 +16,6 @@ export const createOrderService = async (payload) => {
   }
 
   const countyName = getCounty(latitude, longitude);
-  console.log("County name:", countyName);
   if (!countyName) {
     throw new Error("Cannot determine county from given coordinates");
   }
