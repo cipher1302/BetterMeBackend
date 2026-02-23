@@ -2,7 +2,9 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { getAllOrdersService,createOrderService, importOrdersService } from "../services/orderService.js"
 
 export const showAllOrders = asyncHandler(async (req,res)=>{
-    const orders = await getAllOrdersService()
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const orders = await getAllOrdersService({page,limit})
     return res.json({
         message:"Orders found successfully",
         data:orders,

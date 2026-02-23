@@ -1,9 +1,11 @@
 import {Order} from "../db/models/OrderModel.js"
 import getCounty from "../utils/getCountry.js"
 import calculateTax  from "../utils/calculateTax.js";
+import pagination from "../utils/paginationUtils.js"
 
-export const getAllOrdersService = async ()=>{
-    return await Order.findAll()
+export const getAllOrdersService = async ({page,limit})=>{
+    const orders = await pagination(Order,page,limit)
+    return orders
 }   
 
 
