@@ -8,7 +8,7 @@ const serverSequelize = new Sequelize({
     database:"postgres"
 })
 
-const sequelize = new Sequelize({
+export const sequelize = new Sequelize({
     ...baseConfig
 })
 

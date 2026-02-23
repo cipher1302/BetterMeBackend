@@ -2,8 +2,7 @@ import express from 'express';
 import { databaseInit } from './db/sequelizer/sequelizer.js';
 import { getEnvVar } from './utils/getEnvVar.js';
 import cors from 'cors';
-import path from 'path';
-import heroRoutes from './routes/heroRoutes.js';
+import orderRoutes from './routes/orderRoutes.js'
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundRouteHandler } from './middlewares/notFoundRouteHandler.js';
 
@@ -22,6 +21,10 @@ async function startServer(req, res) {
     console.error('❌ Failed to start the server: Database initialization error.', err);
   }
 }
+
+// Routes
+
+app.use("api/orders", orderRoutes)
 
 // Middleware handlers
 app.use(errorHandler);
