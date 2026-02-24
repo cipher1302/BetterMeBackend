@@ -6,7 +6,7 @@ export const showAllOrders = asyncHandler(async (req,res)=>{
     const limit = parseInt(req.query.limit) || 5;
     const { page: _p, limit: _l, ...filters } = req.query;
     const orders = await getAllOrdersService({page,limit,filters})
-    return res.json({
+    return res.status(200).json({
         message:"Orders found successfully",
         data:orders,
     })
@@ -15,7 +15,7 @@ export const showAllOrders = asyncHandler(async (req,res)=>{
 export const createOrder = asyncHandler(async (req,res)=>{
     const payload = req.body
     const newOrder = await createOrderService(payload)
-    return res.json({
+    return res.status(201).json({
         message:"Order created successfully",
         data:newOrder,
     })
@@ -28,5 +28,5 @@ export const importOrders = asyncHandler(async (req,res)=>{
     }
     await importOrdersService(csvData)
 
-    return res.json({ message: 'CSV imported successfully' });
+    return res.status(200).json({ message: 'CSV imported successfully' });
 })
