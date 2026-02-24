@@ -42,6 +42,7 @@ export const createOrderService = async (payload) => {
   const newOrder = await Order.create(orderPayload);
   return newOrder;
 };
+
 export const importOrdersService = async (orders) => {
   const processed = orders
     .map((order, i) => {
@@ -49,23 +50,8 @@ export const importOrdersService = async (orders) => {
       const lng = parseFloat(order.longitude);
       const sub = parseFloat(order.subtotal);
 
-      if (isNaN(lat) || isNaN(lng) || isNaN(sub)) {
-        console.warn(`Order #${i} has invalid number(s), skipping`);
-        return null;
-      }
-
       const countyName = getCounty(lat, lng);
-      if (!countyName) {
-        console.warn(`Order #${i} could not determine county`);
-        return null;
-      }
-
       const taxData = calculateTax(sub, countyName);
-      if (!taxData) {
-        console.warn(`Order #${i} tax calculation failed`);
-        return null;
-      }
-
 
       return {
         ...order,
