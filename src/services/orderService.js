@@ -2,9 +2,11 @@ import {Order} from "../db/models/OrderModel.js"
 import getCounty from "../utils/getCountry.js"
 import calculateTax  from "../utils/calculateTax.js";
 import pagination from "../utils/paginationUtils.js"
+import buildFilterQuery from "../utils/filterUtil.js";
 
-export const getAllOrdersService = async ({page,limit})=>{
-    const orders = await pagination(Order,page,limit)
+export const getAllOrdersService = async ({page=1,limit=5,filters={}})=>{
+    const where = buildFilterQuery(filters);
+    const orders = await pagination(Order,page,limit,where)
     return orders
 }   
 

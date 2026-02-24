@@ -27,7 +27,6 @@ function calculateTax(subtotal, countyName) {
   const rates = taxRates[normalizedCounty];
   
   if (!rates){
-      console.warn(`⚠️ No tax rates found for county "${countyName}" (normalized: "${normalizedCounty}")`);
      throw new Error(`No tax rates for county ${countyName}`);
   }
  
