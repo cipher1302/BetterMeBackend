@@ -15,13 +15,45 @@ export const getAllOrdersService = async ({page=1,limit=5,filters={}})=>{
 export const createOrderService = async (payload) => {
   const { latitude, longitude, subtotal } = payload;
 
-  if (latitude == null || longitude == null) {
-    throw new Error("Latitude and longitude are required");
+  // 1. Грубі межі (Bounding Box) залишаємо для швидкого відсікання "сміттєвих" даних, 
+  // але потрібно враховувати, що деякі точки можуть бути в межах цього прямокутника, 
+  // але не в жодному окрузі NY. 
+  // Тому після цього кроку потрібно буде перевірити, чи дійсно точка знаходиться в одному з округів.
+  const LAT_MIN = 40.4774, LAT_MAX = 45.0153;
+  const LNG_MIN = -79.7624, LNG_MAX = -71.7517;
+
+  const errors = {};
+
+  if (latitude == null) errors.latitude = "Latitude is required";
+  if (longitude == null) errors.longitude = "Longitude is required";
+  if (subtotal == null) {
+    errors.subtotal = "Subtotal is required";
+  } else if (subtotal < 0) {
+    errors.subtotal = "Subtotal must be a positive number";
   }
 
-  const countyName = getCounty(latitude, longitude);
-  if (!countyName) {
-    throw new Error("Cannot determine county from given coordinates");
+  if (!errors.latitude && (latitude < LAT_MIN || latitude > LAT_MAX)) {
+    errors.latitude = "Latitude is outside of New York State range";
+  }
+  if (!errors.longitude && (longitude < LNG_MIN || longitude > LNG_MAX)) {
+    errors.longitude = "Longitude is outside of New York State range";
+  }
+
+  let countyName = null;
+  if (Object.keys(errors).length === 0) {
+    countyName = getCounty(latitude, longitude);
+    
+    if (!countyName) {
+      // Якщо точка в прямокутнику, але не в жодному окрузі NY
+      errors.location = "The coordinates are outside of New York State boundaries";
+    }
+  }
+  if (Object.keys(errors).length > 0) {
+    throw {
+      status: 400, 
+      message: "Validation failed",
+      errors,
+    };
   }
 
   const taxData = calculateTax(subtotal, countyName);
@@ -39,8 +71,7 @@ export const createOrderService = async (payload) => {
     tax_breakdown: taxData.breakdown, 
   };
 
-  const newOrder = await Order.create(orderPayload);
-  return newOrder;
+  return await Order.create(orderPayload);
 };
 
 export const importOrdersService = async (orders) => {
