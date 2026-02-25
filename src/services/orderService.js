@@ -80,9 +80,18 @@ export const importOrdersService = async (orders) => {
       const lat = parseFloat(order.latitude);
       const lng = parseFloat(order.longitude);
       const sub = parseFloat(order.subtotal);
+      if (isNaN(lat) || isNaN(lng) || isNaN(sub)) {
+        return null;
+      }
 
       const countyName = getCounty(lat, lng);
+       if (!countyName) {
+        return null;
+      }
       const taxData = calculateTax(sub, countyName);
+      if (!taxData) {
+        return null;
+      }
 
       return {
         ...order,
