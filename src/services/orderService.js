@@ -3,6 +3,7 @@ import getCounty from "../utils/getCountry.js";
 import calculateTax from "../utils/calculateTax.js";
 import pagination from "../utils/paginationUtils.js";
 import buildFilterQuery from "../utils/filterUtil.js";
+import createHttpError from "http-errors";
 
 export const getAllOrdersService = async ({
   page = 1,
@@ -54,11 +55,9 @@ export const createOrderService = async (payload) => {
     }
   }
   if (Object.keys(errors).length > 0) {
-    throw {
-      status: 400,
-      message: "Validation failed",
+    throw createHttpError(400, "Validation failed", {
       errors,
-    };
+    });
   }
 
   const taxData = calculateTax(subtotal, countyName);
