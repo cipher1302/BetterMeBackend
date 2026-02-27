@@ -84,9 +84,12 @@ export const importOrdersService = async (orders) => {
         return null;
       }
 
-      const countyName = getCounty(lat, lng);
-       if (!countyName) {
-        return null;
+    let countyName;
+
+      try {
+        countyName = getCounty(lat, lng);
+      } catch (err) {
+        return null; 
       }
       const taxData = calculateTax(sub, countyName);
       if (!taxData) {
