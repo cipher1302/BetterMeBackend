@@ -5,9 +5,9 @@ export const Order = sequelize.define(
   "Order",
   {
     county_name: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     latitude: {
       type: DataTypes.DECIMAL(9, 6),
       allowNull: false,
@@ -37,7 +37,7 @@ export const Order = sequelize.define(
       defaultValue: DataTypes.NOW,
     },
     composite_tax_rate: {
-      type: DataTypes.DECIMAL(5, 4), 
+      type: DataTypes.DECIMAL(5, 4),
       allowNull: false,
     },
     tax_amount: {
@@ -67,6 +67,6 @@ export const Order = sequelize.define(
   },
   {
     tableName: "orders",
-    timestamps: false, 
-  }
+    timestamps: false,
+  },
 );

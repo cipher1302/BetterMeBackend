@@ -8,7 +8,7 @@ const upload = multer({ storage });
 const multerCsvMiddleware = (fieldName = "file") => {
   return (req, res, next) => {
     upload.single(fieldName)(req, res, (err) => {
-      if (err) return next(err); 
+      if (err) return next(err);
 
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
@@ -21,8 +21,8 @@ const multerCsvMiddleware = (fieldName = "file") => {
         .pipe(csvParser())
         .on("data", (data) => results.push(data))
         .on("end", () => {
-          req.csvData = results; 
-          next(); 
+          req.csvData = results;
+          next();
         })
         .on("error", (err) => {
           console.error("Error parsing CSV:", err);

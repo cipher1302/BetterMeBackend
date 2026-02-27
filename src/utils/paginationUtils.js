@@ -1,6 +1,13 @@
 // import {Order} from '../db/models/OrderModel.js'
 
-async function pagination(model, page = 1, limit = 5, where = {}, order = [['id', 'ASC']], options={} ) {
+async function pagination(
+  model,
+  page = 1,
+  limit = 5,
+  where = {},
+  order = [["id", "ASC"]],
+  options = {},
+) {
   const offset = (page - 1) * limit;
 
   const { count, rows } = await model.findAndCountAll({

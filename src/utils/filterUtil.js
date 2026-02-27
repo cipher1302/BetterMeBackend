@@ -1,8 +1,9 @@
 import { Op } from "sequelize";
+import dayjs from "dayjs";
 
 export default function buildFilterQuery(filters) {
-    const where = {};
-    if (filters.min_total) {
+  const where = {};
+  if (filters.min_total) {
     where.total_amount = {
       ...where.total_amount,
       [Op.gte]: parseFloat(filters.min_total),
@@ -20,24 +21,32 @@ export default function buildFilterQuery(filters) {
     where.id = filters.id;
   }
 
-  if (filters.start_date) {
-    where.timestamp = {
-      ...where.timestamp,
-      [Op.gte]: new Date(filters.start_date),
-    };
+  if (filters.start_date || filters.end_date) {
+    where.timestamp = {};
+
+    if (filters.start_date) {
+      const start = dayjs(filters.start_date);
+      if (start.isValid()) {
+        where.timestamp[Op.gte] = start.startOf("day").toDate();
+      }
+    }
+
+    if (filters.end_date) {
+      const end = dayjs(filters.end_date);
+      if (end.isValid()) {
+        where.timestamp[Op.lte] = end.endOf("day").toDate();
+      }
+    }
   }
 
-  if (filters.end_date) {
-    const endDate = new Date(filters.end_date);
-    endDate.setHours(23, 59, 59, 999);
-    where.timestamp = { ...where.timestamp, [Op.lte]: endDate };
-  }
+  const hasSpecialFilter = filters.has_special_rates?.toString().toLowerCase();
 
-  if (
-    filters.has_special_rates === 'true' ||
-    filters.has_special_rates === true
-  ) {
-    where.special_rates = { [Op.gt]: 0 };
+  if (hasSpecialFilter === "true" || hasSpecialFilter === "false") {
+    if (hasSpecialFilter === "true") {
+      where.special_rates = { [Op.gt]: 0 };
+    } else {
+      where.special_rates = 0;
+    }
   }
-    return where;
+  return where;
 }

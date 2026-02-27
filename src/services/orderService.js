@@ -1,26 +1,30 @@
-import {Order} from "../db/models/OrderModel.js"
-import getCounty from "../utils/getCountry.js"
-import calculateTax  from "../utils/calculateTax.js";
-import pagination from "../utils/paginationUtils.js"
+import { Order } from "../db/models/OrderModel.js";
+import getCounty from "../utils/getCountry.js";
+import calculateTax from "../utils/calculateTax.js";
+import pagination from "../utils/paginationUtils.js";
 import buildFilterQuery from "../utils/filterUtil.js";
 
-export const getAllOrdersService = async ({page=1,limit=5,filters={}})=>{
-    const where = buildFilterQuery(filters);
-    const orders = await pagination(Order,page,limit,where)
-    return orders
-}   
-
-
+export const getAllOrdersService = async ({
+  page = 1,
+  limit = 5,
+  filters = {},
+}) => {
+  const where = buildFilterQuery(filters);
+  const orders = await pagination(Order, page, limit, where);
+  return orders;
+};
 
 export const createOrderService = async (payload) => {
   const { latitude, longitude, subtotal } = payload;
 
-  // 1. Грубі межі (Bounding Box) залишаємо для швидкого відсікання "сміттєвих" даних, 
-  // але потрібно враховувати, що деякі точки можуть бути в межах цього прямокутника, 
-  // але не в жодному окрузі NY. 
+  // 1. Грубі межі (Bounding Box) залишаємо для швидкого відсікання "сміттєвих" даних,
+  // але потрібно враховувати, що деякі точки можуть бути в межах цього прямокутника,
+  // але не в жодному окрузі NY.
   // Тому після цього кроку потрібно буде перевірити, чи дійсно точка знаходиться в одному з округів.
-  const LAT_MIN = 40.4774, LAT_MAX = 45.0153;
-  const LNG_MIN = -79.7624, LNG_MAX = -71.7517;
+  const LAT_MIN = 40.4774,
+    LAT_MAX = 45.0153;
+  const LNG_MIN = -79.7624,
+    LNG_MAX = -71.7517;
 
   const errors = {};
 
@@ -42,15 +46,16 @@ export const createOrderService = async (payload) => {
   let countyName = null;
   if (Object.keys(errors).length === 0) {
     countyName = getCounty(latitude, longitude);
-    
+
     if (!countyName) {
       // Якщо точка в прямокутнику, але не в жодному окрузі NY
-      errors.location = "The coordinates are outside of New York State boundaries";
+      errors.location =
+        "The coordinates are outside of New York State boundaries";
     }
   }
   if (Object.keys(errors).length > 0) {
     throw {
-      status: 400, 
+      status: 400,
       message: "Validation failed",
       errors,
     };
@@ -68,7 +73,7 @@ export const createOrderService = async (payload) => {
     county_rate: taxData.breakdown.county_rate,
     city_rate: taxData.breakdown.city_rate,
     special_rates: taxData.breakdown.special_rate,
-    tax_breakdown: taxData.breakdown, 
+    tax_breakdown: taxData.breakdown,
   };
 
   return await Order.create(orderPayload);
@@ -84,12 +89,11 @@ export const importOrdersService = async (orders) => {
         return null;
       }
 
-    let countyName;
-
+      let countyName;
       try {
         countyName = getCounty(lat, lng);
       } catch (err) {
-        return null; 
+        return null;
       }
       const taxData = calculateTax(sub, countyName);
       if (!taxData) {

@@ -1,9 +1,8 @@
-import * as turf from '@turf/turf';
-import fs from 'node:fs';
-
+import * as turf from "@turf/turf";
+import fs from "node:fs";
 
 const countiesGeoJSON = JSON.parse(
-  fs.readFileSync(new URL('../../new-york-counties.geojson', import.meta.url))
+  fs.readFileSync(new URL("../../new-york-counties.geojson", import.meta.url)),
 );
 function getCounty(lat, lng) {
   const point = turf.point([lng, lat]);
@@ -16,4 +15,4 @@ function getCounty(lat, lng) {
   return null;
 }
 
-export default getCounty
+export default getCounty;

@@ -6,7 +6,7 @@ export const errorHandler = (err, req, res, next) => {
     return res.status(400).json({
       status: 400,
       message: "Validation error",
-      errors: err.errors.map(e => e.message),
+      errors: err.errors.map((e) => e.message),
     });
   }
 
