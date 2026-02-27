@@ -26,7 +26,7 @@ function calculateTax(subtotal, countyName) {
   const normalizedCounty = normalizeCountyName(countyName);
   const rates = taxRates[normalizedCounty];
   if (!rates){
-     throw new Error(`No tax rates for county ${countyName}`);
+    return null // Якщо немає даних для цього округу, можна повернути null або кинути помилку
   }
  
 
