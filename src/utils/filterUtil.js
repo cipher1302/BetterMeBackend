@@ -18,21 +18,21 @@ export default function buildFilterQuery(filters) {
   }
 
   if (filters.id) {
-    where.id = filters.id;
+    where.id = parseInt(filters.id, 10);
   }
 
   if (filters.start_date || filters.end_date) {
-    where.timestamp = {};
+    where.timestamp = where.timestamp || {};
 
     if (filters.start_date) {
-      const start = dayjs(filters.start_date);
+      const start = dayjs.utc(filters.start_date);
       if (start.isValid()) {
         where.timestamp[Op.gte] = start.startOf("day").toDate();
       }
     }
 
     if (filters.end_date) {
-      const end = dayjs(filters.end_date);
+      const end = dayjs.utc(filters.end_date);
       if (end.isValid()) {
         where.timestamp[Op.lte] = end.endOf("day").toDate();
       }
@@ -40,13 +40,8 @@ export default function buildFilterQuery(filters) {
   }
 
   const hasSpecialFilter = filters.has_special_rates?.toString().toLowerCase();
-
-  if (hasSpecialFilter === "true" || hasSpecialFilter === "false") {
-    if (hasSpecialFilter === "true") {
-      where.special_rates = { [Op.gt]: 0 };
-    } else {
-      where.special_rates = 0;
-    }
+  if (hasSpecialFilter === "true") {
+    where.special_rates = { [Op.gt]: 0 };
   }
   return where;
 }
