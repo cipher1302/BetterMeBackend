@@ -81,43 +81,55 @@ export const createOrderService = async (payload) => {
 export const importOrdersService = async (orders) => {
   const processed = orders
     .map((order, i) => {
-      const lat = parseFloat(order.latitude);
-      const lng = parseFloat(order.longitude);
-      const sub = parseFloat(order.subtotal);
-      if (isNaN(lat) || isNaN(lng) || isNaN(sub)) {
-        return null;
-      }
-
-      let countyName;
       try {
-        countyName = getCounty(lat, lng);
-      } catch (err) {
-        return null;
-      }
-      const taxData = calculateTax(sub, countyName);
-      if (!taxData) {
-        return null;
-      }
+        if (!order || typeof order !== 'object') return null;
 
-      return {
-        ...order,
-        latitude: lat,
-        longitude: lng,
-        subtotal: sub,
-        county_name: countyName,
-        composite_tax_rate: taxData.composite_tax_rate,
-        tax_amount: taxData.tax_amount,
-        total_amount: taxData.total_amount,
-        state_rate: taxData.breakdown.state_rate,
-        county_rate: taxData.breakdown.county_rate,
-        city_rate: taxData.breakdown.city_rate,
-        special_rates: taxData.breakdown.special_rate,
-        tax_breakdown: taxData.breakdown,
-      };
+        const lat = parseFloat(order.latitude);
+        const lng = parseFloat(order.longitude);
+        const sub = parseFloat(order.subtotal);
+        
+        if (isNaN(lat) || isNaN(lng) || isNaN(sub)) {
+          return null;
+        }
+
+        const countyName = getCounty(lat, lng);
+        if (!countyName) {
+          return null;
+        }
+
+        const taxData = calculateTax(sub, countyName);
+        if (!taxData) {
+          return null;
+        }
+
+        return {
+          ...order,
+          latitude: lat,
+          longitude: lng,
+          subtotal: sub,
+          county_name: countyName,
+          composite_tax_rate: taxData.composite_tax_rate,
+          tax_amount: taxData.tax_amount,
+          total_amount: taxData.total_amount,
+          state_rate: taxData.breakdown.state_rate,
+          county_rate: taxData.breakdown.county_rate,
+          city_rate: taxData.breakdown.city_rate,
+          special_rates: taxData.breakdown.special_rate,
+          tax_breakdown: taxData.breakdown,
+        };
+      } catch (err) {
+        console.warn(`[Import Warning]: Skipped row ${i} due to error: ${err.message}`);
+        return null; 
+      }
     })
     .filter(Boolean);
 
+  if (processed.length === 0) {
+    throw new Error('No valid orders found in the uploaded file. Check the format.');
+  }
+
   const processedWithoutId = processed.map(({ id, ...rest }) => rest);
+  
   return await Order.bulkCreate(processedWithoutId, {
     validate: true,
     returning: true,
