@@ -23,6 +23,12 @@ export default function buildFilterQuery(filters) {
     where.id = parseInt(filters.id, 10);
   }
 
+  if (filters.county_name) {
+    where.county_name = {
+      [Op.iLike]: `%${filters.county_name}%`, 
+    };
+  }
+  
   if (filters.start_date || filters.end_date) {
     where.timestamp = where.timestamp || {};
 
